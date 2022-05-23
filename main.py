@@ -1,6 +1,7 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, Response
 from flask_sqlalchemy import SQLAlchemy
 import os
+import json
 
 from sqlalchemy.orm import Session
 
@@ -24,6 +25,11 @@ class Lixeira(db.Model):
     def __repr__(self):
         return '<Lixeira %d>' % self.id
 
+    def dump(self):
+        return {"Lixeira":{'id': self.id,'localizacao':self.localizacao,'capacidade':self.capacidade}}
+
+    def to_dict(self):
+        return {"id": self.id,"localizacao":self.localizacao, "capacidade":self.capacidade}
 
 db.create_all()
 
@@ -43,14 +49,17 @@ def hello_world():
 
 @app.route('/lixeiras')
 def getLixeira():
+
     lixeiras = Lixeira.query.paginate().items
-    res = {}
-    for lixeira in lixeiras:
-        res[lixeira.id] = {
-            'localizacao': lixeira.localizacao,
-            'capacidade': str(lixeira.capacidade),
-        }
-    return jsonify(res)
+    #res = json.dumps([o.dump() for o in lixeiras])
+    json_string = json.dumps([ob.to_dict() for ob in lixeiras])
+
+    # print(type(res))
+    # print(res)
+    print(type(json_string))
+    print(json_string)
+
+    return Response(json_string,  mimetype='application/json')
 
 
 app.run(host='0.0.0.0', port=8080)
