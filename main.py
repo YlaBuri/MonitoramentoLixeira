@@ -23,13 +23,14 @@ class Lixeira(db.Model):
         self.capacidade = capacidade
 
     def __repr__(self):
-        return '<Lixeira %d>' % self.id
+        return 'lixeira'
 
     def dump(self):
-        return {"Lixeira":{'id': self.id,'localizacao':self.localizacao,'capacidade':self.capacidade}}
+        return dict(lixeira={'id': self.id, 'localizacao': self.localizacao, 'capacidade': self.capacidade})
 
     def to_dict(self):
-        return {"id": self.id,"localizacao":self.localizacao, "capacidade":self.capacidade}
+        return {"id": self.id, "localizacao": self.localizacao, "capacidade": self.capacidade}
+
 
 db.create_all()
 
@@ -49,17 +50,18 @@ def hello_world():
 
 @app.route('/lixeiras')
 def getLixeira():
-
     lixeiras = Lixeira.query.paginate().items
-    #res = json.dumps([o.dump() for o in lixeiras])
-    json_string = json.dumps([ob.to_dict() for ob in lixeiras])
 
-    # print(type(res))
-    # print(res)
+    json_string = json.dumps([ob.to_dict() for ob in lixeiras])
+    json_string = json_string.replace("[", "")
+    json_string = json_string.replace("]", "")
+
     print(type(json_string))
     print(json_string)
 
-    return Response(json_string,  mimetype='application/json')
+    return Response(json_string, mimetype='application/json')
+
+
 
 
 app.run(host='0.0.0.0', port=8080)
