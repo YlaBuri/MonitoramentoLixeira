@@ -30,10 +30,12 @@ class Lixeira(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     localizacao = db.Column(db.String(80), nullable=False)
     capacidade = db.Column(db.String(120), nullable=False)
+    aberta = db.Column(db.Boolean, nullable=False)
 
-    def __init__(self, localizacao, capacidade):
+    def __init__(self, localizacao, capacidade, aberta):
         self.localizacao = localizacao
         self.capacidade = capacidade
+        self.aberta = aberta
 
     def __repr__(self):
         return 'lixeira'
@@ -51,8 +53,8 @@ class Lixeira(db.Model):
 db.create_all()
 
 # session = Session()
-# lixeira = Lixeira(localizacao='Banheiro feminino', capacidade='Cheia')
-# lixeira2 = Lixeira(localizacao='Banheiro masculino', capacidade='Vazia')
+# lixeira = Lixeira(localizacao='Banheiro feminino', capacidade='Cheia', aberta=True)
+# lixeira2 = Lixeira(localizacao='Banheiro masculino', capacidade='Vazia', aberta=False)
 # user1 = Usuario("Yla", "yla@email.com", "123")
 # user2 = Usuario("Joaldo", "joaldo@email.com", "123")
 # db.session.add(lixeira)
@@ -61,9 +63,11 @@ db.create_all()
 # db.session.add(user2)
 # db.session.commit()
 
+
 @app.route('/', )
 def index():
     return render_template('login.html')
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -73,13 +77,13 @@ def login():
         email = request.form.get("email_login")
         senha = request.form.get("senha_login")
 
-        user = Usuario.query.filter_by(email=email, senha= senha).first()
+        user = Usuario.query.filter_by(email=email, senha=senha).first()
         if user:
-            print('Logou')
             lixeiras = Lixeira.query.all()
             return render_template('index.html', lixeiras=lixeiras)
         else:
             return render_template('login.html')
+
 
 @app.route('/lixeiras', methods=['GET'])
 def getLixeira():
@@ -90,22 +94,25 @@ def getLixeira():
 @app.route('/lixeiras', methods=['POST'])
 def salvar():
     lixeira = {"localizacao": request.json['localizacao'],
-               "capacidade": request.json['capacidade']}
-    db.session.add(Lixeira(localizacao=lixeira["localizacao"], capacidade=lixeira["capacidade"]))
+               "capacidade": request.json['capacidade'],
+               "aberta": request.json['aberta']}
+    db.session.add(Lixeira(localizacao=lixeira["localizacao"], capacidade=lixeira["capacidade"], aberta=lixeira["aberta"]))
     db.session.commit()
     return jsonify(lixeira)
 
 
 @app.route('/lixeiras/<int:id>', methods=['GET', 'POST'])
 def editar(id):
-    post = db.session.query(Lixeira).filter(Lixeira.id == id).first()
+    lixeira = Lixeira.query.filter_by(id=id).first()
 
     if request.method == 'POST':
-        title = request.form['title']
-        text = request.form['content']
+        capacidade = request.form['title']
+        aberta = request.form['content']
 
-        post.title = title
+        #post.title = title
         # post.body = content
+        lixeira.capacidade = capacidade
+        lixeira.aberta = aberta
 
         db.session.commit()
 
