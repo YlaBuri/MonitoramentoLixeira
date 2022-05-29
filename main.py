@@ -101,21 +101,32 @@ def salvar():
     return jsonify(lixeira)
 
 
-@app.route('/capacidadeLixeiras/<int:id>', methods=['GET', 'POST'])
-def editarEstado(id):
-    lixeira = Lixeira.query.filter_by(id=id).first()
-    if request.method == 'POST':
-        l = { "capacidade": request.json['capacidade']}
-        lixeira.capacidade = l["capacidade"]
-        db.session.commit()
-        return jsonify(l)
+# @app.route('/capacidadeLixeiras/<int:id>', methods=['GET', 'POST'])
+# def editarEstado(id):
+#     lixeira = Lixeira.query.filter_by(id=id).first()
+#     if request.method == 'POST':
+#         l = { "capacidade": request.json['capacidade']}
+#         lixeira.capacidade = l["capacidade"]
+#         db.session.commit()
+#         return jsonify(l)
+#
+#
+# @app.route('/estadoLixeiras/<int:id>', methods=['GET', 'POST'])
+# def editarCapacidade(id):
+#     lixeira = Lixeira.query.filter_by(id=id).first()
+#     if request.method == 'POST':
+#         l = { "aberta": request.json['aberta']}
+#         lixeira.aberta = l["aberta"]
+#         db.session.commit()
+#         return jsonify(l)
 
-
-@app.route('/estadoLixeiras/<int:id>', methods=['GET', 'POST'])
+@app.route('/editar/<int:id>', methods=['GET', 'POST'])
 def editarCapacidade(id):
     lixeira = Lixeira.query.filter_by(id=id).first()
     if request.method == 'POST':
-        l = { "aberta": request.json['aberta']}
+        l = {"capacidade": request.json['capacidade'],
+             "aberta": request.json['aberta']}
+        lixeira.capacidade = l["capacidade"]
         lixeira.aberta = l["aberta"]
         db.session.commit()
         return jsonify(l)

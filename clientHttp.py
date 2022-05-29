@@ -1,51 +1,80 @@
 import json
 from urllib import request, parse
+import time
+
+def xor_int_str(val, str):
+    return val ^ int(str, 10)
+
+
+def swap(a, b):
+    t = S[a]
+    S[a] = S[b]
+    S[b] = t
+
+
+def rc4(key, data):
+    # KSA
+    j = 0
+    for i in range(0, 256):
+        j = (j + S[i] + ord(key[i % len(key)])) % 256
+        swap(S[i], S[j])
+
+    # PRGA
+    i = j = 0
+    for k in range(0, len(data)):
+        i = (i + 1) % 256
+        j = (j + S[i]) % 256
+        swap(S[i], S[j])
+
+        val = ord(data[k]) ^ S[(S[i] + S[j]) % 256]
+        has.append(chr(val))
+
+
+while True:
+    skey = "Topesp"
+    S = [i for i in range(0, 256)]
+    has = []
+    mensagem_crip = input()
+    rc4(skey, mensagem_crip)
+    mensagem_descrip = has
+    time.sleep(5)
+    id = "".join(mensagem_descrip[0:2])
+    mensagemCapacidade = "".join(mensagem_descrip[2:4])
+    mensagemEstado = "".join(mensagem_descrip[4:])
+
+    print(mensagemEstado)
+    print(mensagemCapacidade)
+    alterarEstado = False
+    alterarCapacidade = False
+
+
+    if mensagemCapacidade == '01':
+        capacidade = "Vazia"
+
+    elif mensagemCapacidade == '02':
+        capacidade = "Meio Cheio"
+
+    elif mensagemCapacidade == '03':
+        capacidade = "Cheio"
 
 
 
-mensagem_descrip = "0104"
+    if mensagemEstado == '04':
+        aberta = True
 
-id = mensagem_descrip[0:2]
-mensagem = mensagem_descrip[2:]
-alterarEstado = False
-alterarCapacidade = False
-
-
-if mensagem == "01":
-    capacidade = "Vazia"
-    alterarCapacidade = True
-elif mensagem == "02":
-    capacidade = "Meio Cheio"
-    alterarCapacidade = True
-elif mensagem == "03":
-    capacidade = "Cheio"
-    alterarCapacidade = True
+    elif mensagemEstado == '05':
+        aberta = False
 
 
-if mensagem == "04":
-    aberta = True
-    alterarEstado = True
-elif mensagem == "05":
-    aberta = False
-    alterarEstado = True
 
 
-if alterarEstado:
-    data = {"aberta": aberta}
+    data = {"capacidade": capacidade, "aberta": aberta}
     encoded_data = json.dumps(data).encode()
-    pathRequest = 'http://127.0.0.1:8080/estadoLixeiras/' + str(int(id))
+    pathRequest = 'http://127.0.0.1:8080/editar/' + str(int(id))
     req = request.Request(pathRequest, data=encoded_data)
     req.add_header('Content-Type', 'application/json')
     response = request.urlopen(req)
     text = response.read()
     print(json.loads(text.decode('utf-8')))
-elif alterarCapacidade:
-    data = {"capacidade": capacidade}
-    encoded_data = json.dumps(data).encode()
-    pathRequest = 'http://127.0.0.1:8080/capacidadeLixeiras/' + str(int(id))
-    req = request.Request(pathRequest, data=encoded_data)
-    req.add_header('Content-Type', 'application/json')
-    response = request.urlopen(req)
-    text = response.read()
-    print(json.loads(text.decode('utf-8')))
+
 
