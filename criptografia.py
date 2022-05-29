@@ -2,10 +2,6 @@ S = [i for i in range(0, 256)]
 has = []
 
 
-def xor_int_str(val, str):
-    return val ^ int(str, 10)
-
-
 def swap(a, b):
     t = S[a]
     S[a] = S[b]

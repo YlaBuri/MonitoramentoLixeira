@@ -101,24 +101,24 @@ def salvar():
     return jsonify(lixeira)
 
 
-@app.route('/lixeiras/<int:id>', methods=['GET', 'POST'])
-def editar(id):
+@app.route('/capacidadeLixeiras/<int:id>', methods=['GET', 'POST'])
+def editarEstado(id):
     lixeira = Lixeira.query.filter_by(id=id).first()
-
     if request.method == 'POST':
-        capacidade = request.form['title']
-        aberta = request.form['content']
-
-        #post.title = title
-        # post.body = content
-        lixeira.capacidade = capacidade
-        lixeira.aberta = aberta
-
+        l = { "capacidade": request.json['capacidade']}
+        lixeira.capacidade = l["capacidade"]
         db.session.commit()
+        return jsonify(l)
 
-        # return redirect(url_for('post', id=id))
-    # else:
-    # return render_template('something.html', post=post)
+
+@app.route('/estadoLixeiras/<int:id>', methods=['GET', 'POST'])
+def editarCapacidade(id):
+    lixeira = Lixeira.query.filter_by(id=id).first()
+    if request.method == 'POST':
+        l = { "aberta": request.json['aberta']}
+        lixeira.aberta = l["aberta"]
+        db.session.commit()
+        return jsonify(l)
 
 
 app.run(host='0.0.0.0', port=8080)
