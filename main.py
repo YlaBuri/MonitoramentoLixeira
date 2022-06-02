@@ -63,6 +63,32 @@ db.create_all()
 # db.session.add(user2)
 # db.session.commit()
 
+S = [i for i in range(0, 256)]
+has = []
+
+def swap(a, b):
+    global S
+    t = S[a]
+    S[a] = S[b]
+    S[b] = t
+
+
+def rc4(key, data):
+    global S, has
+    # KSA
+    j = 0
+    for i in range(0, 256):
+        j = (j + S[i] + ord(key[i % len(key)])) % 256
+        swap(S[i], S[j])
+
+    # PRGA
+    i = j = 0
+    for k in range(0, len(data)):
+        i = (i + 1) % 256
+        j = (j + S[i]) % 256
+        swap(S[i], S[j])
+        val = ord(data[k]) ^ S[(S[i] + S[j]) % 256]
+        has.append(chr(val))
 
 @app.route('/', )
 def index():
@@ -101,35 +127,44 @@ def salvar():
     return jsonify(lixeira)
 
 
-# @app.route('/capacidadeLixeiras/<int:id>', methods=['GET', 'POST'])
-# def editarEstado(id):
-#     lixeira = Lixeira.query.filter_by(id=id).first()
-#     if request.method == 'POST':
-#         l = { "capacidade": request.json['capacidade']}
-#         lixeira.capacidade = l["capacidade"]
-#         db.session.commit()
-#         return jsonify(l)
-#
-#
-# @app.route('/estadoLixeiras/<int:id>', methods=['GET', 'POST'])
-# def editarCapacidade(id):
-#     lixeira = Lixeira.query.filter_by(id=id).first()
-#     if request.method == 'POST':
-#         l = { "aberta": request.json['aberta']}
-#         lixeira.aberta = l["aberta"]
-#         db.session.commit()
-#         return jsonify(l)
-
-@app.route('/editar/<int:id>', methods=['GET', 'POST'])
-def editarCapacidade(id):
-    lixeira = Lixeira.query.filter_by(id=id).first()
+@app.route('/editar', methods=['GET', 'POST'])
+def editarCapacidade():
+    global S, has
+    S = [i for i in range(0, 256)]
+    has = []
     if request.method == 'POST':
-        l = {"capacidade": request.json['capacidade'],
-             "aberta": request.json['aberta']}
-        lixeira.capacidade = l["capacidade"]
-        lixeira.aberta = l["aberta"]
+        data_crip = {"data": request.json['mensagem_crip']}
+        skey = "Topesp"
+        rc4(skey, data_crip["data"])
+        mensagem_descrip = has
+        id = "".join(mensagem_descrip[0:2])
+        mensagemCapacidade = "".join(mensagem_descrip[2:4])
+        mensagemEstado = "".join(mensagem_descrip[4:])
+        # print(mensagem_descrip)
+        # print(id)
+        # print(mensagemEstado)
+        # print(mensagemCapacidade)
+
+        if mensagemCapacidade == '01':
+            capacidade = "Vazia"
+
+        elif mensagemCapacidade == '02':
+            capacidade = "Meio Cheio"
+
+        elif mensagemCapacidade == '03':
+            capacidade = "Cheio"
+
+        if mensagemEstado == '04':
+            aberta = True
+
+        elif mensagemEstado == '05':
+            aberta = False
+
+        lixeira = Lixeira.query.filter_by(id=int(id)).first()
+        lixeira.capacidade = capacidade
+        lixeira.aberta = aberta
         db.session.commit()
-        return jsonify(l)
+        return jsonify(lixeira.to_dict())
 
 
 app.run(host='0.0.0.0', port=8080)
