@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<body class="container">
+    <div class="container-center" >
+        <a class="links" id="paralogin"></a>
+
+        <div class="content">
+          <div id="login">
+            <form method="post" action="/cadastrarUsuario">
+              <h1>Cadatrar Usuário</h1>
+                <p>
+                <label for="nome_cadastro">Seu Nome</label>
+                <input id="nome_cadastro" name="nome_cadastro" required="required" type="text" />
+              </p>
+
+              <p>
+                <label for="email_cadastro">Seu e-mail</label>
+                <input id="email_cadastro" name="email_cadastro" required="required" type="text" placeholder="contato@htmlecsspro.com"/>
+              </p>
+
+              <p>
+                <label for="senha_cadastro">Sua senha</label>
+                <input id="senha_cadastro" name="senha_cadastro" required="required" type="password" placeholder="1234" />
+              </p>
+
+              <p>
+                   <input type="submit" value="Cadastrar" />
+              </p>
+
+            </form>
+
+
+          </div>
+        </div>
+      </div>
+
+</body>
+{% endblock %}
