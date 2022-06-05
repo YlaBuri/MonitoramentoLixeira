@@ -4,8 +4,13 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lixeiras</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
+          integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
     <link rel= "stylesheet" type= "text/css" href= "{{url_for('static',filename='style.css') }}">
-    <title>Login</title>
+
 </head>
 <body class="container-center">
     <div class="container" >
@@ -32,20 +37,9 @@
               
             </form>
 
-            <script>
-                function login() {
-                    var login = document.getElementById('email_login').value;
-                    var password = document.getElementById('senha_login').value;
-
-                    if(login == "admin@email.com" && password == "123"){
-                        location.href = "index.html"
-                    }
-                }
-            </script>
           </div>
         </div>
       </div> 
-    
 </body>
-</html>
 
+</html>

@@ -1,9 +1,11 @@
 import json
 import os
+import sqlite3
 
 from flask import Flask, request, url_for, redirect, render_template
 from flask import jsonify
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.orm import Session
 
 file_path = os.path.abspath(os.getcwd()) + "\database.db"
@@ -24,6 +26,18 @@ class Usuario(db.Model):
         self.nome = nome
         self.email = email
         self.senha = senha
+
+    @classmethod
+    def find_by_email(cls, email):
+        connection = sqlite3.connect('database.db')
+        cursor = connection.cursor()
+
+        try:
+            data = cursor.execute('SELECT * FROM Usuario WHERE email=?', (email,)).fetchone()
+            if data:
+                return cls(data[1], data[2], data[3])
+        finally:
+            connection.close()
 
 
 class Lixeira(db.Model):
@@ -55,12 +69,8 @@ db.create_all()
 # session = Session()
 # lixeira = Lixeira(localizacao='Banheiro feminino', capacidade='Cheia', aberta=True)
 # lixeira2 = Lixeira(localizacao='Banheiro masculino', capacidade='Vazia', aberta=False)
-# user1 = Usuario("Yla", "yla@email.com", "123")
-# user2 = Usuario("Joaldo", "joaldo@email.com", "123")
 # db.session.add(lixeira)
 # db.session.add(lixeira2)
-# db.session.add(user1)
-# db.session.add(user2)
 # db.session.commit()
 
 S = [i for i in range(0, 256)]
@@ -97,18 +107,51 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    global S, has
     if request.method == 'GET':
         return render_template('login.html')
     elif request.method == 'POST':
+        S = [i for i in range(0, 256)]
+        has = []
+        skey = "Topesp"
+
         email = request.form.get("email_login")
         senha = request.form.get("senha_login")
+        rc4(skey, senha)
+        senha_crip = "".join(has)
 
-        user = Usuario.query.filter_by(email=email, senha=senha).first()
+        user = Usuario.query.filter_by(email=email, senha=senha_crip).first()
+
+        # if user and check_password_hash(user.senha, senha):
+        #     print('message Password is correct')  # You'll want to return a token that verifies the user in the future
+        # return print('error User or password are incorrect')
+
         if user:
             lixeiras = Lixeira.query.all()
             return render_template('index.html', lixeiras=lixeiras)
         else:
             return render_template('login.html')
+
+
+@app.route('/cadastrarUsuario', methods=['GET', 'POST'])
+def cadastrarUsuario():
+    global S, has
+    if request.method == 'GET':
+        return render_template('cadastrarUsuario.html')
+    elif request.method == 'POST':
+        S = [i for i in range(0, 256)]
+        has = []
+        skey = "Topesp"
+        nome = request.form.get("nome_cadastro")
+        email = request.form.get("email_cadastro")
+        senha = request.form.get("senha_cadastro")
+
+        rc4(skey, senha)
+        senha_crip = "".join(has)
+        usuario = Usuario(nome, email, senha_crip)
+        db.session.add(usuario)
+        db.session.commit()
+        return render_template('login.html')
 
 
 @app.route('/lixeiras', methods=['GET'])
