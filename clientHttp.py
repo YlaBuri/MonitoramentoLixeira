@@ -9,7 +9,7 @@ while True:
     mensagem_crip = input()
     time.sleep(2)
 
-    data = {"mensagem_crip":mensagem_crip}
+    data = {"mensagem_crip": mensagem_crip}
 
     encoded_data = json.dumps(data).encode()
     pathRequest = 'http://127.0.0.1:8080/editar'

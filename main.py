@@ -182,7 +182,7 @@ def editarCapacidade():
         mensagem_descrip = has
         id = "".join(mensagem_descrip[0:2])
         mensagemCapacidade = "".join(mensagem_descrip[2:4])
-        mensagemEstado = "".join(mensagem_descrip[4:])
+        mensagemEstado = "".join(mensagem_descrip[4:6])
         # print(mensagem_descrip)
         # print(id)
         # print(mensagemEstado)
